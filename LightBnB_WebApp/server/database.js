@@ -1,5 +1,15 @@
-const properties = require('./json/properties.json');
+/// Database connection code
+
+const { Pool } = require('pg');
+const pool = new Pool({
+  host: 'localhost',
+  database: 'lightbnb'
+});
+
+// const properties = require('./json/properties.json');
 const users = require('./json/users.json');
+
+
 
 /// Users
 
@@ -32,7 +42,6 @@ const getUserWithId = function(id) {
 }
 exports.getUserWithId = getUserWithId;
 
-
 /**
  * Add a new user to the database.
  * @param {{name: string, password: string, email: string}} user
@@ -46,6 +55,8 @@ const addUser =  function(user) {
 }
 exports.addUser = addUser;
 
+
+
 /// Reservations
 
 /**
@@ -58,6 +69,8 @@ const getAllReservations = function(guest_id, limit = 10) {
 }
 exports.getAllReservations = getAllReservations;
 
+
+
 /// Properties
 
 /**
@@ -66,15 +79,20 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-const getAllProperties = function(options, limit = 10) {
-  const limitedProperties = {};
-  for (let i = 1; i <= limit; i++) {
-    limitedProperties[i] = properties[i];
-  }
-  return Promise.resolve(limitedProperties);
-}
-exports.getAllProperties = getAllProperties;
 
+const getAllProperties = (options, limit = 10) => {
+  return pool
+    .query(`SELECT * FROM properties LIMIT $1`, [limit])
+    .then((result) => {
+      console.log(result.rows);
+      return result.rows;
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
+
+exports.getAllProperties = getAllProperties;
 
 /**
  * Add a property to the database
