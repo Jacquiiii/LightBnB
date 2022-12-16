@@ -11,6 +11,19 @@ const pool = new Pool({
 
 
 
+/// Helper functions ------------------------------------------
+
+// checks if a WHERE or AND clause should be inserted into the query
+const whereAndCheck = function() {
+  if (queryParams.length === 0) {
+    return 'WHERE';
+  } else {
+    return 'AND';
+  }
+};
+
+
+
 /// Users -----------------------------------------------------
 
 /**
@@ -119,28 +132,56 @@ const getAllProperties = (options, limit = 10) => {
   SELECT properties.*, avg(property_reviews.rating) as average_rating
   FROM properties
   JOIN property_reviews ON properties.id = property_id
-  WHERE TRUE
   `;
 
   if (options.city) {
     queryParams.push(`%${options.city}%`);
-    queryString += `AND city LIKE $${queryParams.length} `;
+    queryString += `${whereAndCheck()} city LIKE $${queryParams.length} `;
   }
 
   if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
-    queryString += `AND owner_id = $${queryParams.length} `;
+    queryString += `${whereAndCheck()} owner_id = $${queryParams.length} `;
   }
 
   if (options.minimum_price_per_night) {
     queryParams.push(`${options.minimum_price_per_night * 100}`);
-    queryString += `AND cost_per_night >= $${queryParams.length} `;
+    queryString += `${whereAndCheck()} cost_per_night >= $${queryParams.length} `;
   }
 
   if (options.maximum_price_per_night) {
     queryParams.push(`${options.maximum_price_per_night * 100}`);
-    queryString += `AND cost_per_night <= $${queryParams.length} `;
+    queryString += `${whereAndCheck()} cost_per_night <= $${queryParams.length} `;
   }
+
+// Alternate version of code above
+  // const queryParams = [];
+  // let queryString = `
+  // SELECT properties.*, avg(property_reviews.rating) as average_rating
+  // FROM properties
+  // JOIN property_reviews ON properties.id = property_id
+  // WHERE TRUE
+  // `;
+
+  // if (options.city) {
+  //   queryParams.push(`%${options.city}%`);
+  //   queryString += `AND city LIKE $${queryParams.length} `;
+  // }
+
+  // if (options.owner_id) {
+  //   queryParams.push(`${options.owner_id}`);
+  //   queryString += `AND owner_id = $${queryParams.length} `;
+  // }
+
+  // if (options.minimum_price_per_night) {
+  //   queryParams.push(`${options.minimum_price_per_night * 100}`);
+  //   queryString += `AND cost_per_night >= $${queryParams.length} `;
+  // }
+
+  // if (options.maximum_price_per_night) {
+  //   queryParams.push(`${options.maximum_price_per_night * 100}`);
+  //   queryString += `AND cost_per_night <= $${queryParams.length} `;
+  // }
 
   queryString += `
   GROUP BY properties.id
