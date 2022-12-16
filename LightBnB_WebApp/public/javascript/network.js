@@ -52,3 +52,11 @@ const submitProperty = function(data) {
     data,
   });
 }
+
+// add reservation code, not finished
+// function reserve() {
+//   let url = "/api/reserve";
+//   return $.ajax({
+//     url,
+//   });
+// }

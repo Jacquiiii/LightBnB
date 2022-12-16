@@ -29,3 +29,6 @@ $(() => {
   window.propertyListing.createListing = createListing;
 
 });
+
+// add reservation code, not finished
+{/* <button class="reserve" type="submit">Reserve</button> */}

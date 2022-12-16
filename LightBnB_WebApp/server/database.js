@@ -14,8 +14,8 @@ const pool = new Pool({
 /// Helper functions ------------------------------------------
 
 // checks if a WHERE or AND clause should be inserted into the query
-const whereAndCheck = function() {
-  if (queryParams.length === 0) {
+const whereAndCheck = function(data) {
+  if (data.length === 0) {
     return 'WHERE';
   } else {
     return 'AND';
@@ -115,6 +115,25 @@ const getAllReservations = (guest_id, limit = 10) => {
 exports.getAllReservations = getAllReservations;
 
 
+// add reservation code, not finished
+// const addReservation = (reservation) => {
+
+//   const queryString = `
+//   INSERT INTO reservations (start_date, end_date) 
+//   VALUES ($1, $2)
+//   RETURNING *;
+//   `;
+//   const values = [reservation.start_date, reservation.end_date];
+
+//   return pool
+//     .query(queryString, values)
+//     .then((result) => result.rows[0])
+//     .catch((err) => console.log(err.message));
+// };
+
+// exports.addReservation = addReservation;
+
+
 
 /// Properties --------------------------------------------------
 
@@ -136,22 +155,22 @@ const getAllProperties = (options, limit = 10) => {
 
   if (options.city) {
     queryParams.push(`%${options.city}%`);
-    queryString += `${whereAndCheck()} city LIKE $${queryParams.length} `;
+    queryString += `${whereAndCheck(queryParams)} city LIKE $${queryParams.length} `;
   }
 
   if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
-    queryString += `${whereAndCheck()} owner_id = $${queryParams.length} `;
+    queryString += `${whereAndCheck(queryParams)} owner_id = $${queryParams.length} `;
   }
 
   if (options.minimum_price_per_night) {
     queryParams.push(`${options.minimum_price_per_night * 100}`);
-    queryString += `${whereAndCheck()} cost_per_night >= $${queryParams.length} `;
+    queryString += `${whereAndCheck(queryParams)} cost_per_night >= $${queryParams.length} `;
   }
 
   if (options.maximum_price_per_night) {
     queryParams.push(`${options.maximum_price_per_night * 100}`);
-    queryString += `${whereAndCheck()} cost_per_night <= $${queryParams.length} `;
+    queryString += `${whereAndCheck(queryParams)} cost_per_night <= $${queryParams.length} `;
   }
 
 // Alternate version of code above
@@ -256,3 +275,4 @@ exports.getAllProperties = getAllProperties;
 };
 
 exports.addProperty = addProperty;
+
